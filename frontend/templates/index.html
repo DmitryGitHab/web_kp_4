@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LSK Wind Load Calculator</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="/static/js/app.js" defer></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>LSK Wind Load Calculator</h1>
+            <div class="logo">LSK.PRO</div>
+        </header>
+        <form id="calculationForm" style="display: none;"></form>
+        <div class="app-container">
+            <div class="input-section">
+                <div class="card">
+                    <h2><span class="icon">📐</span> Геометрические параметры</h2>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="lsk_name">Обозначение конструкции</label>
+                            <input type="text" id="lsk_name" name="lsk_name">
+                        </div>
+                        <div class="form-group">
+                            <label for="construction_oriented">Ориентация</label>
+                            <select id="construction_oriented" name="construction_oriented">
+                                <option value="Горизонтально">Горизонтально</option>
+                                <option value="Вертикально">Вертикально</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <h3>Основные размеры (мм)</h3>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="long_side_1">Длина проема (L)</label>
+                            <input type="number" id="long_side_1" name="long_side_1" step="1">
+                        </div>
+                        <div class="form-group">
+                            <label for="short_side_1">Ширина проема (B)</label>
+                            <input type="number" id="short_side_1" name="short_side_1" step="1">
+                        </div>
+                    </div>
+
+                    <h3>Монтажные зазоры (мм)</h3>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="long_side_2">По длине (1 сторона)</label>
+                            <input type="number" id="long_side_2" name="long_side_2" step="1" value="10">
+                        </div>
+                        <div class="form-group">
+                            <label for="long_side_2_1">По длине (2 сторона)</label>
+                            <input type="number" id="long_side_2_1" name="long_side_2_1" step="1" value="10">
+                        </div>
+                        <div class="form-group">
+                            <label for="short_side_2">По ширине (1 сторона)</label>
+                            <input type="number" id="short_side_2" name="short_side_2" step="1" value="10">
+                        </div>
+                        <div class="form-group">
+                            <label for="short_side_2_1">По ширине (2 сторона)</label>
+                            <input type="number" id="short_side_2_1" name="short_side_2_1" step="1" value="10">
+                        </div>
+                    </div>
+
+                    <h3>Полки уголков (мм)</h3>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="long_side_3">По длине (1 сторона)</label>
+                            <input type="number" id="long_side_3" name="long_side_3" step="1" value="10">
+                        </div>
+                        <div class="form-group">
+                            <label for="long_side_3_1">По длине (2 сторона)</label>
+                            <input type="number" id="long_side_3_1" name="long_side_3_1" step="1" value="10">
+                        </div>
+                        <div class="form-group">
+                            <label for="short_side_3">По ширине (1 сторона)</label>
+                            <input type="number" id="short_side_3" name="short_side_3" step="1" value="10">
+                        </div>
+                        <div class="form-group">
+                            <label for="short_side_3_1">По ширине (2 сторона)</label>
+                            <input type="number" id="short_side_3_1" name="short_side_3_1" step="1" value="10">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2><span class="icon">🌬️</span> Ветровые параметры</h2>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="wind_area">Ветровой район</label>
+                            <select id="wind_area" name="wind_area">
+                                <option value="1a">1a</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                                <option value="6">6</option>
+                                <option value="7">7</option>
+                                <option value="Ia">Ia</option>
+                                <option value="I">I</option>
+                                <option value="II">II</option>
+                                <option value="III">III</option>
+                                <option value="IV">IV</option>
+                                <option value="V">V</option>
+                                <option value="VI">VI</option>
+                                <option value="VII">VII</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="local_type">Тип местности</label>
+                            <select id="local_type" name="local_type">
+                                <option value="A">A - Открытая</option>
+                                <option value="B">B - Городская</option>
+                                <option value="C">C - Лесная</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="h_max">Макс. высота (м)</label>
+                            <input type="number" id="h_max" name="h_max" step="0.1" value="10">
+                        </div>
+                        <div class="form-group">
+                            <label for="aero_coff">Аэродинамический коэффициент</label>
+                            <input type="number" id="aero_coff" name="aero_coff" step="0.01" value="1.0">
+                        </div>
+                        <div class="form-group">
+                            <label for="koef_safety">Коэф. запаса прочности</label>
+                            <input type="number" id="koef_safety" name="koef_safety" step="0.01" value="1.0">
+                        </div>
+                        <div class="form-group">
+                            <label for="overpressure_opening">Давление открытия (Па)</label>
+                            <input type="number" id="overpressure_opening" name="overpressure_opening" step="1" value="65">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2><span class="icon">⚙️</span> Параметры крепления</h2>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="quantity_cons">Кол-во конструкций</label>
+                            <input type="number" id="quantity_cons" name="quantity_cons" min="1" value="1">
+                        </div>
+                        <div class="form-group">
+                            <label for="quantity_nodes">Кол-во узлов</label>
+                            <input type="number" id="quantity_nodes" name="quantity_nodes" min="1" value="1">
+                        </div>
+                        <div class="form-group">
+                            <label for="quantity_uts">Кол-во УТС</label>
+                            <input type="number" id="quantity_uts" name="quantity_uts" min="1" value="1">
+                        </div>
+                        <div class="form-group">
+                            <label for="holder_a_side">Сторона A кронштейна (мм)</label>
+                            <input type="number" id="holder_a_side" name="holder_a_side" step="1" value="100">
+                        </div>
+                        <div class="form-group">
+                            <label for="holder_b_side">Сторона B кронштейна (мм)</label>
+                            <input type="number" id="holder_b_side" name="holder_b_side" step="1" value="100">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2><span class="icon">📏</span> Параметры угла</h2>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="wall_thickness">Толщина стены (мм)</label>
+                            <input type="number" id="wall_thickness" name="wall_thickness" step="1" value="100">
+                        </div>
+                        <div class="form-group">
+                            <label for="hole_overlap">Перекрытие отверстия (мм)</label>
+                            <input type="number" id="hole_overlap" name="hole_overlap" step="1" value="50">
+                        </div>
+                        <div class="form-group">
+                            <label for="len_to_centre_construction">До центра (мм)</label>
+                            <input type="number" id="len_to_centre_construction" name="len_to_centre_construction" step="1" value="100">
+                        </div>
+                        <div class="form-group">
+                            <label for="alpha_koef">Коэффициент α</label>
+                            <input type="number" id="alpha_koef" name="alpha_koef" step="0.01" value="1.0">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="results-s<div class="results-section">
+                <div class="card results-card">
+                    <h2><span class="icon">📊</span> Результаты расчетов</h2>
+
+                    <div class="result-category">
+                        <h3>Геометрические параметры</h3>
+                        <div class="results-grid">
+                            <div class="result-item">
+                                <label>Полезная длина:</label>
+                                <div class="result-value" id="long_side_usefull">-</div>
+                            </div>
+                            <div class="result-item">
+                                <label>Полезная ширина:</label>
+                                <div class="result-value" id="short_side_usefull">-</div>
+                            </div>
+                            <div class="result-item">
+                                <label>Длина окна:</label>
+                                <div class="result-value" id="long_window">-</div>
+                            </div>
+                            <div class="result-item">
+                                <label>Ширина окна:</label>
+                                <div class="result-value" id="short_window">-</div>
+                            </div>
+                            <div class="result-item">
+                                <label>Расстояние между узлами:</label>
+                                <div class="result-value" id="len_between_nodes">-</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="result-category">
+                        <h3>Площади</h3>
+                        <div class="results-grid">
+                            <div class="result-item">
+                                <label>Площадь проема (м²):</label>
+                                <div class="result-value" id="s_hole">-</div>
+                            </div>
+                            <div class="result-item">
+                                <label>Площадь окна (м²):</label>
+                                <div class="result-value" id="s_window">-</div>
+                            </div>
+                            <div class="result-item">
+                                <label>Полезная площадь (м²):</label>
+                                <div class="result-value" id="s_usefull">-</div>
+                            </div>
+                            <div class="result-item">
+                                <label>S эффективное 1 (м²):</label>
+                                <div class="result-value" id="s_effictive_1">-</div>
+                            </div>
+                            <div class="result-item">
+                                <label>S эффективное ветровое max (м²):</label>
+                                <div class="result-value" id="s_effictive_wind_max">-</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="result-category">
+                        <h3>Ветровые параметры</h3>
+                        <div class="results-grid">
+                            <div class="result-item">
+                                <label>Wo (ветровое давление):</label>
+                                <div class="result-value" id="w_0">-</div>
+                            </div>
+                            <div class="result-item">
+                                <label>Коэффициент k:</label>
+                                <div class="result-value" id="k_koef">-</div>
+                            </div>
+                            <div class="result-item">
+                                <label>Коэффициент пульсации:</label>
+                                <div class="result-value" id="ripple_ratio">-</div>
+                            </div>
+                            <div class="result-item">
+                                <label>Коэффициент корреляции:</label>
+                                <div class="result-value" id="correlation_coff">-</div>
+                            </div>
+                            <div class="result-item">
+                                <label>Пиковая ветровая нагрузка (Па):</label>
+                                <div class="result-value" id="wind_peak_load">-</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="result-category">
+                        <h3>Критические параметры</h3>
+                        <div class="results-grid">
+                            <div class="result-item critical-param" id="p_min_container">
+                                <label>Минимальное давление (Pmin):</label>
+                                <div class="result-value" id="p_min">-</div>
+                                <div class="status-info" id="p_min_status"></div>
+                            </div>
+                            <div class="result-item critical-param" id="p_max_container">
+                                <label>Максимальное давление (Pmax):</label>
+                                <div class="result-value" id="p_max">-</div>
+                                <div class="status-info" id="p_max_status"></div>
+                            </div>
+                            <div class="result-item critical-param" id="pressure_diff_container">
+                                <label>Разница давлений (ΔP):</label>
+                                <div class="result-value" id="pressure_diff">-</div>
+                                <div class="status-info" id="pressure_diff_status"></div>
+                            </div>
+                            <div class="result-item critical-param" id="angle_container">
+                                <label>Угол α:</label>
+                                <div class="result-value" id="angle_a">-</div>
+                                <div class="status-info" id="angle_status"></div>
+                            </div>
+                            <div class="result-item">
+                                <label>Рабочая длина стропа:</label>
+                                <div class="result-value" id="sling_len_work">-</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="chart-container">
+                        <canvas id="resultsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
