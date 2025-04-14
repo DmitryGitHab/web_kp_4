@@ -1,58 +1,7 @@
-from pydantic import BaseModel, EmailStr
-from typing import List, Optional
-from datetime import datetime
+from pydantic import BaseModel
+from typing import Optional
 
-
-class UserBase(BaseModel):
-    username: str
-    email: Optional[EmailStr] = None
-    is_active: Optional[bool] = True
-    is_admin: Optional[bool] = False
-
-
-class UserCreate(UserBase):
-    password: str
-
-
-class User(UserBase):
-    id: int
-
-    class Config:
-        from_attributes = True
-
-
-class Token(BaseModel):
-    access_token: str
-    token_type: str
-
-
-class TokenData(BaseModel):
-    username: Optional[str] = None
-
-
-class ProposalBase(BaseModel):
-    title: str
-    description: Optional[str] = None
-
-
-class ProposalCreate(ProposalBase):
-    pass
-
-
-class Proposal(ProposalBase):
-    id: int
-    created_at: str
-    user_id: int
-
-    class Config:
-        from_attributes = True
-
-
-class LskStructureBase(BaseModel):
-    name: str
-    proposal_id: int
-
-    # Все поля из предыдущей CalculationInput
+class CalculationBase(BaseModel):
     long_side_1: float
     long_side_2: float
     long_side_3: float
@@ -79,15 +28,13 @@ class LskStructureBase(BaseModel):
     len_to_centre_construction: float
     alpha_koef: float
     construction_oriented: str
+    lsk_name: str
 
-
-class LskStructureCreate(LskStructureBase):
+class CalculationInput(CalculationBase):
     pass
 
-
-class LskStructure(LskStructureBase):
+class CalculationOutput(CalculationBase):
     id: int
-    # Все результаты расчетов
     long_side_usefull: float
     short_side_usefull: float
     long_window: float

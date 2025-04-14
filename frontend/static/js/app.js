@@ -1,13 +1,37 @@
 document.addEventListener('DOMContentLoaded', function() {
-    const inputFields = document.querySelectorAll('input, select');
+    // Элементы интерфейса
+    const loginForm = document.getElementById('loginForm');
+    const userInfo = document.getElementById('userInfo');
+    const currentUserSpan = document.getElementById('currentUser');
+    const loginBtn = document.getElementById('loginBtn');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const createProposalBtn = document.getElementById('createProposalBtn');
+    const proposalSelect = document.getElementById('proposalSelect');
+    const saveLskBtn = document.getElementById('saveLskBtn');
+    const inputFields = document.querySelectorAll('input[data-field], select[data-field]');
+
+    let currentToken = null;
+    let currentProposalId = null;
     let calculationTimeout;
     let resultsChart = null;
+
+    // Инициализация
+        // Инициализация
+    checkAuthStatus();
+    loadProposals();
 
     // Назначаем обработчики на все поля ввода
     inputFields.forEach(field => {
         field.addEventListener('input', debounceCalculation);
         field.addEventListener('change', debounceCalculation);
     });
+
+    // Обработчики событий
+    loginBtn.addEventListener('click', login);
+    logoutBtn.addEventListener('click', logout);
+    createProposalBtn.addEventListener('click', createProposal);
+    proposalSelect.addEventListener('change', loadProposalDetails);
+    saveLskBtn.addEventListener('click', saveLskStructure);
 
     // Дебаунс для предотвращения частых запросов
     function debounceCalculation() {
@@ -23,7 +47,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const response = await fetch('/calculate/', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
+                    'Content-Type': 'application/json'
                 },
                 body: JSON.stringify(data)
             });
@@ -31,8 +55,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const responseData = await response.json();
 
             if (!response.ok) {
-                console.error('Validation errors:', responseData.errors);
-                showValidationErrors(responseData.errors);
+                console.error('Calculation error:', responseData);
                 throw new Error(responseData.detail || 'Ошибка расчета');
             }
 
@@ -40,6 +63,228 @@ document.addEventListener('DOMContentLoaded', function() {
             updateChart(responseData.results);
         } catch (error) {
             console.error('Calculation error:', error);
+            showError('Ошибка расчета: ' + error.message);
+        }
+    }
+
+    // Показать ошибку
+    function showError(message) {
+        const errorDiv = document.getElementById('calculationError');
+        if (!errorDiv) {
+            const container = document.querySelector('.app-container');
+            const div = document.createElement('div');
+            div.id = 'calculationError';
+            div.className = 'error-message';
+            div.textContent = message;
+            container.prepend(div);
+        } else {
+            errorDiv.textContent = message;
+        }
+    }
+
+    // Функции авторизации
+    async function checkAuthStatus() {
+        const token = localStorage.getItem('token');
+        if (token) {
+            try {
+                const response = await fetch('/users/me/', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (response.ok) {
+                    const user = await response.json();
+                    currentToken = token;
+                    showUserInfo(user.username);
+                } else {
+                    localStorage.removeItem('token');
+                }
+            } catch (error) {
+                console.error('Auth check failed:', error);
+                localStorage.removeItem('token');
+            }
+        }
+    }
+
+    async function login() {
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+
+        try {
+            const formData = new FormData();
+            formData.append('username', username);
+            formData.append('password', password);
+            formData.append('grant_type', 'password');
+
+            const response = await fetch('/token', {
+                method: 'POST',
+                body: formData
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                currentToken = data.access_token;
+                localStorage.setItem('token', currentToken);
+                showUserInfo(username);
+                loadProposals();
+            } else {
+                alert('Ошибка авторизации. Проверьте логин и пароль.');
+            }
+        } catch (error) {
+            console.error('Login failed:', error);
+            alert('Ошибка соединения с сервером.');
+        }
+    }
+
+    function logout() {
+        currentToken = null;
+        localStorage.removeItem('token');
+        hideUserInfo();
+        clearProposals();
+    }
+
+    function showUserInfo(username) {
+        currentUserSpan.textContent = username;
+        loginForm.style.display = 'none';
+        userInfo.style.display = 'flex';
+    }
+
+    function hideUserInfo() {
+        loginForm.style.display = 'flex';
+        userInfo.style.display = 'none';
+    }
+
+    // Работа с коммерческими предложениями
+    async function loadProposals() {
+        if (!currentToken) return;
+
+        try {
+            const response = await fetch('/proposals/', {
+                headers: {
+                    'Authorization': `Bearer ${currentToken}`
+                }
+            });
+
+            if (response.ok) {
+                const proposals = await response.json();
+                updateProposalSelect(proposals);
+            }
+        } catch (error) {
+            console.error('Failed to load proposals:', error);
+        }
+    }
+
+    function updateProposalSelect(proposals) {
+        proposalSelect.innerHTML = '<option value="">-- Выберите КП --</option>';
+
+        proposals.forEach(proposal => {
+            const option = document.createElement('option');
+            option.value = proposal.id;
+            option.textContent = proposal.title;
+            proposalSelect.appendChild(option);
+        });
+    }
+
+    function clearProposals() {
+        proposalSelect.innerHTML = '<option value="">-- Выберите КП --</option>';
+        document.getElementById('proposalDetails').innerHTML = '';
+        document.getElementById('proposalLskList').innerHTML = '';
+    }
+
+    async function createProposal() {
+        if (!currentToken) {
+            alert('Для создания КП необходимо авторизоваться');
+            return;
+        }
+
+        const title = document.getElementById('proposalTitle').value;
+        const description = document.getElementById('proposalDescription').value;
+
+        if (!title) {
+            alert('Введите название КП');
+            return;
+        }
+
+        try {
+            const response = await fetch('/proposals/', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${currentToken}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    title: title,
+                    description: description
+                })
+            });
+
+            if (response.ok) {
+                alert('КП успешно создано');
+                document.getElementById('proposalTitle').value = '';
+                document.getElementById('proposalDescription').value = '';
+                loadProposals();
+            } else {
+                alert('Ошибка при создании КП');
+            }
+        } catch (error) {
+            console.error('Failed to create proposal:', error);
+            alert('Ошибка соединения с сервером');
+        }
+    }
+
+    async function loadProposalDetails() {
+        currentProposalId = this.value;
+        if (!currentProposalId) {
+            document.getElementById('proposalDetails').innerHTML = '';
+            document.getElementById('proposalLskList').innerHTML = '';
+            return;
+        }
+
+        try {
+            // Загружаем детали КП
+            const proposalResponse = await fetch(`/proposals/${currentProposalId}`, {
+                headers: {
+                    'Authorization': `Bearer ${currentToken}`
+                }
+            });
+
+            // Загружаем список конструкций КП
+            const lskResponse = await fetch(`/lsk/${currentProposalId}`, {
+                headers: {
+                    'Authorization': `Bearer ${currentToken}`
+                }
+            });
+
+            if (proposalResponse.ok && lskResponse.ok) {
+                const proposal = await proposalResponse.json();
+                const lskStructures = await lskResponse.json();
+
+                // Отображаем детали КП
+                const proposalDetails = document.getElementById('proposalDetails');
+                proposalDetails.innerHTML = `
+                    <p><strong>Название:</strong> ${proposal.title}</p>
+                    <p><strong>Описание:</strong> ${proposal.description || 'нет'}</p>
+                    <p><strong>Дата создания:</strong> ${new Date(proposal.created_at).toLocaleString()}</p>
+                `;
+
+                // Отображаем список конструкций
+                const lskList = document.getElementById('proposalLskList');
+                if (lskStructures.length > 0) {
+                    lskList.innerHTML = '<h4>Конструкции в этом КП:</h4>';
+                    const list = document.createElement('ul');
+                    lskStructures.forEach(lsk => {
+                        const item = document.createElement('li');
+                        item.textContent = `${lsk.name} (${lsk.long_side_usefull} x ${lsk.short_side_usefull} мм)`;
+                        list.appendChild(item);
+                    });
+                    lskList.appendChild(list);
+                } else {
+                    lskList.innerHTML = '<p>В этом КП пока нет конструкций</p>';
+                }
+            }
+        } catch (error) {
+            console.error('Failed to load proposal details:', error);
         }
     }
 
@@ -48,34 +293,79 @@ document.addEventListener('DOMContentLoaded', function() {
         const data = {};
 
         inputFields.forEach(field => {
-            if (field.name && field.value.trim() !== '') {
-                data[field.name] = isNaN(field.value) ? field.value : Number(field.value);
+            if (field.dataset.field && field.value.trim() !== '') {
+                data[field.dataset.field] = isNaN(field.value) ? field.value : Number(field.value);
             }
         });
 
         return data;
     }
 
-    // Отображение ошибок валидации
-    function showValidationErrors(errors) {
-        // Сначала скрываем все предыдущие ошибки
-        document.querySelectorAll('.error-message').forEach(el => el.remove());
-        document.querySelectorAll('.has-error').forEach(el => el.classList.remove('has-error'));
+    // Сохранение конструкции
+    async function saveLskStructure() {
+        if (!currentToken) {
+            alert('Для сохранения конструкции необходимо авторизоваться');
+            return;
+        }
 
-        // Показываем новые ошибки
-        errors.forEach(error => {
-            const field = document.querySelector(`[name="${error.field}"]`);
-            if (field) {
-                const formGroup = field.closest('.form-group');
-                if (formGroup) {
-                    formGroup.classList.add('has-error');
-                    const errorElement = document.createElement('div');
-                    errorElement.className = 'error-message';
-                    errorElement.textContent = error.message;
-                    formGroup.appendChild(errorElement);
-                }
+        if (!currentProposalId) {
+            alert('Выберите коммерческое предложение');
+            return;
+        }
+
+        const lskName = document.getElementById('lsk_name').value;
+        if (!lskName) {
+            alert('Введите название конструкции');
+            return;
+        }
+
+        // Сначала выполняем расчет
+        const calculationData = collectFormData();
+        try {
+            const calcResponse = await fetch('/calculate/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${currentToken}`
+                },
+                body: JSON.stringify(calculationData)
+            });
+
+            if (!calcResponse.ok) {
+                const errorData = await calcResponse.json();
+                throw new Error(errorData.detail || 'Ошибка расчета');
             }
-        });
+
+            const calcResults = await calcResponse.json();
+
+            // Теперь сохраняем конструкцию с результатами расчета
+            const saveData = {
+                ...calculationData,
+                ...calcResults.results,
+                proposal_id: currentProposalId,
+                name: lskName
+            };
+
+            const saveResponse = await fetch('/lsk/', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${currentToken}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(saveData)
+            });
+
+            if (saveResponse.ok) {
+                alert('Конструкция успешно сохранена');
+                loadProposalDetails(); // Обновляем список конструкций
+            } else {
+                const errorData = await saveResponse.json();
+                alert(`Ошибка при сохранении: ${errorData.detail || 'Неизвестная ошибка'}`);
+            }
+        } catch (error) {
+            console.error('Failed to save LSK:', error);
+            alert(`Ошибка: ${error.message}`);
+        }
     }
 
     // Отображение результатов

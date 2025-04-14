@@ -1,41 +1,12 @@
-from sqlalchemy import Column, Integer, Float, String, Boolean, ForeignKey
-from sqlalchemy.orm import relationship
+from sqlalchemy import Column, Integer, Float, String, Boolean
 from .database import Base
 
 
-class User(Base):
-    __tablename__ = "users"
+class Calculation(Base):
+    __tablename__ = "calculations"
 
     id = Column(Integer, primary_key=True, index=True)
-    username = Column(String, unique=True, index=True)
-    hashed_password = Column(String)
-    is_active = Column(Boolean, default=True)
-    is_admin = Column(Boolean, default=False)
-
-    proposals = relationship("Proposal", back_populates="owner")
-
-
-class Proposal(Base):
-    __tablename__ = "proposals"
-
-    id = Column(Integer, primary_key=True, index=True)
-    title = Column(String, index=True)
-    description = Column(String)
-    created_at = Column(String)
-    user_id = Column(Integer, ForeignKey("users.id"))
-
-    owner = relationship("User", back_populates="proposals")
-    lsk_structures = relationship("LskStructure", back_populates="proposal")
-
-
-class LskStructure(Base):
-    __tablename__ = "lsk_structures"
-
-    id = Column(Integer, primary_key=True, index=True)
-    proposal_id = Column(Integer, ForeignKey("proposals.id"))
-    name = Column(String)
-
-    # Все параметры из предыдущей модели Calculation
+    # Input fields
     long_side_1 = Column(Float)
     long_side_2 = Column(Float)
     long_side_3 = Column(Float)
@@ -62,8 +33,9 @@ class LskStructure(Base):
     len_to_centre_construction = Column(Float)
     alpha_koef = Column(Float)
     construction_oriented = Column(String)
+    lsk_name = Column(String)
 
-    # Результаты расчетов
+    # Results fields
     long_side_usefull = Column(Float)
     short_side_usefull = Column(Float)
     long_window = Column(Float)
@@ -86,5 +58,3 @@ class LskStructure(Base):
     warning = Column(String)
     warning_2 = Column(String)
     warning_angle_value = Column(String)
-
-    proposal = relationship("Proposal", back_populates="lsk_structures")

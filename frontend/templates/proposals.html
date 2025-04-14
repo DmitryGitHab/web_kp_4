@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Коммерческие предложения - LSK Calculator</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Коммерческие предложения</h1>
+            <div class="header-actions">
+                <button id="newProposalBtn">Создать КП</button>
+                <button id="logoutBtn">Выйти</button>
+            </div>
+        </header>
+
+        <div class="proposals-list" id="proposalsList">
+            <!-- Список КП будет загружен через JS -->
+        </div>
+    </div>
+
+    <!-- Модальное окно создания КП -->
+    <div class="modal" id="proposalModal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Новое коммерческое предложение</h2>
+            <form id="proposalForm">
+                <div class="form-group">
+                    <label for="proposalTitle">Название</label>
+                    <input type="text" id="proposalTitle" required>
+                </div>
+                <div class="form-group">
+                    <label for="proposalDescription">Описание</label>
+                    <textarea id="proposalDescription"></textarea>
+                </div>
+                <button type="submit">Создать</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="/static/js/proposals.js"></script>
+</body>
+</html>

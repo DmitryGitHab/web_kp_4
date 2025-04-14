@@ -12,63 +12,18 @@
     <div class="container">
         <header>
             <h1>LSK Wind Load Calculator</h1>
-            <div class="auth-section">
-                <div id="loginForm" class="login-form">
-                    <input type="text" id="username" placeholder="Логин">
-                    <input type="password" id="password" placeholder="Пароль">
-                    <button id="loginBtn">Войти</button>
-                </div>
-                <div id="userInfo" class="user-info" style="display: none;">
-                    <span id="currentUser"></span>
-                    <button id="logoutBtn">Выйти</button>
-                </div>
-            </div>
+            <div class="logo">LSK.PRO</div>
         </header>
-
-        <div class="proposal-management">
-            <div class="card">
-                <h2><span class="icon">📋</span> Коммерческие предложения</h2>
-                <div class="form-group">
-                    <label for="proposalTitle">Название КП</label>
-                    <input type="text" id="proposalTitle">
-                </div>
-                <div class="form-group">
-                    <label for="proposalDescription">Описание</label>
-                    <textarea id="proposalDescription" rows="2"></textarea>
-                </div>
-                <button id="createProposalBtn" class="btn-primary">Создать КП</button>
-
-<!--                <div class="form-group" style="margin-top: 20px;">-->
-<!--                    <label for="proposalSelect">Выберите КП</label>-->
-<!--                    <select id="proposalSelect">-->
-<!--                        <option value="">&#45;&#45; Выберите КП &#45;&#45;</option>-->
-<!--                    </select>-->
-<!--                </div>-->
-
-                <div id="proposalInfo" class="proposal-info">
-                    <h3>Информация о КП</h3>
-                    <div id="proposalDetails"></div>
-                    <div id="proposalLskList"></div>
-                </div>
-            </div>
-        </div>
+        <form id="calculationForm" style="display: none;"></form>
         <div class="app-container">
             <div class="input-section">
                 <div class="card">
                     <h2><span class="icon">📐</span> Геометрические параметры</h2>
                     <div class="form-grid">
-                    <div class="form-group">
-                        <label for="lsk_name">Название конструкции</label>
-                        <input type="text" id="lsk_name" name="lsk_name">
-                    </div>
-
                         <div class="form-group">
-                        <label for="proposalSelect">Коммерческое предложение</label>
-                        <select id="proposalSelect" name="proposal_id" required>
-                            <option value="">-- Выберите КП --</option>
-                        </select>
-                         </div>
-                    <button id="saveLskBtn" class="btn-primary">Сохранить конструкцию</button>
+                            <label for="lsk_name">Обозначение конструкции</label>
+                            <input type="text" id="lsk_name" name="lsk_name">
+                        </div>
                         <div class="form-group">
                             <label for="construction_oriented">Ориентация</label>
                             <select id="construction_oriented" name="construction_oriented">
@@ -231,118 +186,114 @@
                 </div>
             </div>
 
-            <div class="results-section">
+            <div class="results-s<div class="results-section">
                 <div class="card results-card">
                     <h2><span class="icon">📊</span> Результаты расчетов</h2>
 
                     <div class="result-category">
-                        <h3><span class="icon">📐</span> Геометрические параметры</h3>
-                        <div class="result-grid">
+                        <h3>Геометрические параметры</h3>
+                        <div class="results-grid">
                             <div class="result-item">
                                 <label>Полезная длина:</label>
-                                <span id="long_side_usefull" class="result-value">-</span>
+                                <div class="result-value" id="long_side_usefull">-</div>
                             </div>
                             <div class="result-item">
                                 <label>Полезная ширина:</label>
-                                <span id="short_side_usefull" class="result-value">-</span>
+                                <div class="result-value" id="short_side_usefull">-</div>
                             </div>
                             <div class="result-item">
                                 <label>Длина окна:</label>
-                                <span id="long_window" class="result-value">-</span>
+                                <div class="result-value" id="long_window">-</div>
                             </div>
                             <div class="result-item">
                                 <label>Ширина окна:</label>
-                                <span id="short_window" class="result-value">-</span>
+                                <div class="result-value" id="short_window">-</div>
                             </div>
                             <div class="result-item">
                                 <label>Расстояние между узлами:</label>
-                                <span id="len_between_nodes" class="result-value">-</span>
+                                <div class="result-value" id="len_between_nodes">-</div>
                             </div>
                         </div>
                     </div>
 
                     <div class="result-category">
-                        <h3><span class="icon">📏</span> Площади</h3>
-                        <div class="result-grid">
+                        <h3>Площади</h3>
+                        <div class="results-grid">
                             <div class="result-item">
-                                <label>Площадь проема:</label>
-                                <span id="s_hole" class="result-value">-</span>
+                                <label>Площадь проема (м²):</label>
+                                <div class="result-value" id="s_hole">-</div>
                             </div>
                             <div class="result-item">
-                                <label>Площадь окна:</label>
-                                <span id="s_window" class="result-value">-</span>
+                                <label>Площадь окна (м²):</label>
+                                <div class="result-value" id="s_window">-</div>
                             </div>
                             <div class="result-item">
-                                <label>Полезная площадь:</label>
-                                <span id="s_usefull" class="result-value">-</span>
+                                <label>Полезная площадь (м²):</label>
+                                <div class="result-value" id="s_usefull">-</div>
                             </div>
                             <div class="result-item">
-                                <label>S эффективное 1:</label>
-                                <span id="s_effictive_1" class="result-value">-</span>
+                                <label>S эффективное 1 (м²):</label>
+                                <div class="result-value" id="s_effictive_1">-</div>
                             </div>
                             <div class="result-item">
-                                <label>S эффективное ветровое max:</label>
-                                <span id="s_effictive_wind_max" class="result-value">-</span>
+                                <label>S эффективное ветровое max (м²):</label>
+                                <div class="result-value" id="s_effictive_wind_max">-</div>
                             </div>
                         </div>
                     </div>
 
                     <div class="result-category">
-                        <h3><span class="icon">🌬️</span> Ветровые параметры</h3>
-                        <div class="result-grid">
+                        <h3>Ветровые параметры</h3>
+                        <div class="results-grid">
                             <div class="result-item">
-                                <label>Wo:</label>
-                                <span id="w_0" class="result-value">-</span>
+                                <label>Wo (ветровое давление):</label>
+                                <div class="result-value" id="w_0">-</div>
                             </div>
                             <div class="result-item">
                                 <label>Коэффициент k:</label>
-                                <span id="k_koef" class="result-value">-</span>
+                                <div class="result-value" id="k_koef">-</div>
                             </div>
                             <div class="result-item">
                                 <label>Коэффициент пульсации:</label>
-                                <span id="ripple_ratio" class="result-value">-</span>
+                                <div class="result-value" id="ripple_ratio">-</div>
                             </div>
                             <div class="result-item">
                                 <label>Коэффициент корреляции:</label>
-                                <span id="correlation_coff" class="result-value">-</span>
+                                <div class="result-value" id="correlation_coff">-</div>
                             </div>
                             <div class="result-item">
-                                <label>Пиковая ветровая нагрузка:</label>
-                                <span id="wind_peak_load" class="result-value">-</span>
+                                <label>Пиковая ветровая нагрузка (Па):</label>
+                                <div class="result-value" id="wind_peak_load">-</div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="result-category critical-params">
-                        <h3><span class="icon">⚠️</span> Критические параметры</h3>
-                        <div class="result-grid">
-                            <div class="result-item">
-                                <label>Pmin:</label>
-                                <span id="p_min" class="result-value">-</span>
+                    <div class="result-category">
+                        <h3>Критические параметры</h3>
+                        <div class="results-grid">
+                            <div class="result-item critical-param" id="p_min_container">
+                                <label>Минимальное давление (Pmin):</label>
+                                <div class="result-value" id="p_min">-</div>
+                                <div class="status-info" id="p_min_status"></div>
                             </div>
-                            <div class="result-item">
-                                <label>Pmax:</label>
-                                <span id="p_max" class="result-value">-</span>
+                            <div class="result-item critical-param" id="p_max_container">
+                                <label>Максимальное давление (Pmax):</label>
+                                <div class="result-value" id="p_max">-</div>
+                                <div class="status-info" id="p_max_status"></div>
                             </div>
-                            <div class="result-item">
-                                <label>Статус Pmax:</label>
-                                <span id="warning" class="result-value">-</span>
+                            <div class="result-item critical-param" id="pressure_diff_container">
+                                <label>Разница давлений (ΔP):</label>
+                                <div class="result-value" id="pressure_diff">-</div>
+                                <div class="status-info" id="pressure_diff_status"></div>
                             </div>
-                            <div class="result-item">
-                                <label>Разница Pmax-Pmin:</label>
-                                <span id="warning_2" class="result-value">-</span>
-                            </div>
-                            <div class="result-item">
+                            <div class="result-item critical-param" id="angle_container">
                                 <label>Угол α:</label>
-                                <span id="angle_a" class="result-value">-</span>
-                            </div>
-                            <div class="result-item">
-                                <label>Статус угла:</label>
-                                <span id="warning_angle_value" class="result-value">-</span>
+                                <div class="result-value" id="angle_a">-</div>
+                                <div class="status-info" id="angle_status"></div>
                             </div>
                             <div class="result-item">
                                 <label>Рабочая длина стропа:</label>
-                                <span id="sling_len_work" class="result-value">-</span>
+                                <div class="result-value" id="sling_len_work">-</div>
                             </div>
                         </div>
                     </div>
